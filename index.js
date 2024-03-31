@@ -109,9 +109,9 @@ const main = async () => {
       "-i",
       `${folder_dir}/${file}`,
       "-c:v",
-      "copy",
+      "libx264",
       "-c:a",
-      "copy",
+      "aac",
       `${folder_dir}/${OUTPUT_DIR_NAME}/${outputName}`,
     ]);
 
