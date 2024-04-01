@@ -34,3 +34,24 @@ npm start D:directory_with_videos example_bucket_name "example/videos/put_files_
 ```bash
 node path_to_script.js D:directory_with_videos example_bucket_name "example/videos/put_files_here
 ```
+
+## Naming conventions
+
+For the sake of setting metadata files should be name a certain way.
+
+Underscores are used to seperate attributes of a file.
+
+Order is important.
+
+For example:
+
+"Show Name_S1_E1_Episode Name.mp4" will result in:
+
+```json
+{
+  "show": "Show Name",
+  "season": "1",
+  "episode": "1",
+  "episodeName": "Episode Name"
+}
+```

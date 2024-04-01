@@ -64,6 +64,9 @@ const main = async () => {
     for (let i = 0; i < convertedFiles.length; i++) {
       const file = convertedFiles[i];
 
+      const [show, season, episode, episodeName] =
+        removeSuffix(file).split("_");
+
       const fileSize = fs.statSync(
         `${folder_dir}/${OUTPUT_DIR_NAME}/${file}`
       ).size;
@@ -76,6 +79,12 @@ const main = async () => {
 
       await bucket.upload(`${folder_dir}/${OUTPUT_DIR_NAME}/${file}`, {
         destination: `${gcloud_destination}/${file}`,
+        metadata: {
+          show,
+          season,
+          episode,
+          episodeName,
+        },
         onUploadProgress: ({ bytesWritten, contentLength }) => {
           const currentProgess = Math.round((bytesWritten / fileSize) * 100);
           if (currentProgess !== prevProgress) {
@@ -103,6 +112,8 @@ const main = async () => {
     const file = files[fileIndex];
     const outputName = `${removeSuffix(file)}.mp4`;
 
+    const startTime = performance.now();
+
     console.log(`Creating ffmpeg process for: ${file}`);
 
     // some of these parameters are required for for the video to run on safari
@@ -110,9 +121,12 @@ const main = async () => {
     // but -profile:v main was the change that got it to work
     // -pix_fmt yuv420p was required for the command to run
     // src: https://superuser.com/questions/1200080/ffmpeg-encoded-mp4-wont-play-in-safari-works-in-chrome-ff
+
     const ffmpegProcess = spawn("ffmpeg", [
       "-i",
       `${folder_dir}/${file}`,
+      "-map_metadata",
+      "-1",
       "-pix_fmt",
       "yuv420p",
       "-c:v",
@@ -142,7 +156,9 @@ const main = async () => {
 
     ffmpegProcess.on("close", (code) => {
       if (code === 0) {
-        console.log(`Conversion of ${file} successful`);
+        console.log(
+          `Conversion of ${file} complete in ${performance.now() - startTime}ms`
+        );
         convertFile(fileIndex + 1);
       } else {
         console.error(`Conversion of ${file} failed with code ${code}`);
