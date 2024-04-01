@@ -105,13 +105,26 @@ const main = async () => {
 
     console.log(`Creating ffmpeg process for: ${file}`);
 
+    // some of these parameters are required for for the video to run on safari
+    // im not entirely sure which one it is but i believe video codec h264 and audio codec acc should work on safari
+    // but -profile:v main was the change that got it to work
+    // -pix_fmt yuv420p was required for the command to run
+    // src: https://superuser.com/questions/1200080/ffmpeg-encoded-mp4-wont-play-in-safari-works-in-chrome-ff
     const ffmpegProcess = spawn("ffmpeg", [
       "-i",
       `${folder_dir}/${file}`,
+      "-pix_fmt",
+      "yuv420p",
       "-c:v",
       "libx264",
+      "-profile:v",
+      "main",
       "-c:a",
       "aac",
+      "-movflags",
+      "+faststart",
+      "-crf",
+      "23",
       `${folder_dir}/${OUTPUT_DIR_NAME}/${outputName}`,
     ]);
 
