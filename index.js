@@ -50,7 +50,13 @@ const main = async () => {
 
   const files = fs
     .readdirSync(folder_dir)
-    .filter((file) => isFile(file, folder_dir));
+    .filter((file) => isFile(file, folder_dir))
+    .filter((file) => {
+      // dont convert files that already exist in the output directory
+      return !fs.existsSync(
+        `${folder_dir}/${OUTPUT_DIR_NAME}/${removeSuffix(file)}.mp4`
+      );
+    });
 
   const uploadToBucket = async () => {
     const storage = new Storage();
